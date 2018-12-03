@@ -1,0 +1,15 @@
+bool very_cool_function(bool a, int b){
+	if(a == false)return -b;
+	else{
+		int count = 0;
+		while(b > count)count++, b--;
+		return (count + 23) / 5;
+	}
+}
+
+int main(){
+	double a = 34;
+	string st = "some string data";
+	cout << very_cool_function(true, 67);
+	return 0;
+}
