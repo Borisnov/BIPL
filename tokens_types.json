@@ -19,20 +19,27 @@
 		"&",
 		"^",
 		"!",
+		"=",
 		"||",
+		"|",
 		"&&",
 		"%",
+		"==",
+		"++",
+		"--",
 		"+=",
 		"*=",
 		"/=",
 		"%="
 	],
-	"constant": [
-		"NUMBER",
-		"STRING"
-	],
 	"reserved_word": [
 		"for",
-		"while"
+		"while",
+		"if",
+		"else",
+		"return",
+		"catch",
+		"try",
+		"auto"
 	]
 }
