@@ -9,7 +9,13 @@ bool very_cool_function(bool a, int b){
 
 int main(){
 	double a = 34;
+	//some comments
 	string st = "some string data";
 	cout << very_cool_function(true, 67);
 	return 0;
+	/*
+	saljdfklsjf
+dfdsjdsjfejfjg
+kdsfejfewjfoefwj8988*88888
+*/
 }

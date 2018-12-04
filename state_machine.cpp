@@ -44,9 +44,8 @@ int main(){
     string code = "";
     char c;
     while(code_file.get(c))code += c;
+    code += '\n';
     code_file.close();
-    //code += (char)(0);
-    //DBG(code)
 
     ///Initializing all necessary
     int code_length = code.length();
@@ -65,24 +64,37 @@ int main(){
                     state = "name";
                 else if(c >= '0' && c <= '9')
                     state = "integer";
-                else if(find_token("syntax", string(1, c))){
-                    char_index ++;
-                    curr_token += c;
-                    add("syntax");
-                }else if(find_token("operation", string(1, c)))
-                    state = "operation";
+                else if(all_tokens.count(string(1, c)))
+                    state = "combination";
                 else if(c == '"' || string(1, c) == "'")
                     state = "string";
                 else throw string("Unexpected symbol " + c);
             }
-            else if(state == "operation"){
-                if(find_token("operation", curr_token + c)){
+            else if(state == "combination"){
+                if(all_tokens.count(curr_token + c)){
                     curr_token += c;
                     char_index ++;
                 }else{
                     state = "begin";
-                    add("operation");
+                    if(curr_token == "//")
+                        state = "line_comment",
+                        curr_token = "";
+                    else if(curr_token == "/*")
+                        state = "multiline_comment",
+                        curr_token = "";
+                    else if(curr_token == "*/")
+                        throw string("Unexpected (*/) closing multi line comment");
+                    else
+                        add(token_type[curr_token]);
                 }
+            }else if(state == "line_comment"){
+                if(c == '\n')state = "begin";
+                else char_index ++;
+            }else if(state == "multiline_comment"){
+                if(c == '*' && code[char_index + 1] == '/'){
+                    char_index += 2;
+                    state = "begin";
+                }else char_index ++;
             }else if(state == "integer"){
                 if(c >= '0' && c <= '9'){
                     curr_token += c;
@@ -130,6 +142,12 @@ int main(){
                 }
             }
         }
+        if(state == "multiline_comment")
+            throw string("Multi line comments wasn't closed");
+        else if(state == "string")
+            throw string("String constant wasn't closed");
+        else if(state != "begin")
+            throw string("UNEXPECTED ERROR!");
     }catch(string error){
         cout<<"Error position = "<<char_index<<'\n';
         cout<<error<<'\n';
