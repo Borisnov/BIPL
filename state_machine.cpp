@@ -4,7 +4,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-//For more convenient work
+///For more convenient work
 #define DBG(x) cout<<#x<<" = "<<x<<'\n';
 
 map<string, set<string>>tokens_in_category;

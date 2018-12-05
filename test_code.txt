@@ -15,7 +15,12 @@ int main(){
 	return 0;
 	/*
 	saljdfklsjf
-dfdsjdsjfejfjg
-kdsfejfewjfoefwj8988*88888
-*/
+	dfdsjdsjfejfjg
+	kdsfejfewjfoefwj8988*88888
+	while(true)do something
+	*/
+	for(int i = 0; i < 6; i++){
+		print(4328973.334)
+		cout<<'jfdjfdsfjsdfji "string inside string"';;
+	}
 }
