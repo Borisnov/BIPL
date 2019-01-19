@@ -22,14 +22,7 @@ void add(string type){
 bool find_token(string category, string token){
     return tokens_in_category[category].count(token);
 }
-
-int main(){
-    ///Preparing types from json data file
-    //json data_json;
-    //ifstream data_types("tokens_types.json");
-    //data_types >> data_json;
-    //data_types.close();
-    vector<pair<string, vector<string>>>tokens_initializing = {
+vector<pair<string, vector<string>>>tokens_initializing = {
         {"syntax",{
             "{",
             "}",
@@ -78,6 +71,14 @@ int main(){
             "auto"
         }}
     };
+///Start one time before using tokenization function;
+void begining_preparation(){
+    ///Preparing types from json data file
+    //json data_json;
+    //ifstream data_types("tokens_types.json");
+    //data_types >> data_json;
+    //data_types.close();
+
 
     for(auto it : tokens_initializing){
         string key = it.first;
@@ -88,20 +89,19 @@ int main(){
             tokens_in_category[key].insert(value);
         }
     }
-
-    ///Open input code file
-    ifstream code_file("test_code.txt");
-    string code = "";
-    char c;
-    while(code_file.get(c))code += c;
+}
+///main function to tokenizing code string
+vector<pair<string, string>> tokenization(string code){
     code += '\n';
-    code_file.close();
-
+    vector<pair<string, string>>empty_tokens;
     ///Initializing all necessary
+    result_tokens.clear();
+    curr_token = "";
     int code_length = code.length();
     int char_index = 0;
-    string state = "begin";
 
+    string state = "begin";
+    char c;
     ///Loop of whole code string
     try{
         while(char_index < code_length){
@@ -199,18 +199,12 @@ int main(){
         else if(state != "begin")
             throw string("UNEXPECTED ERROR! state = " + state);
     }catch(string error){
-        ofstream result_pair("code_tokens.txt");
-        result_pair<<"Error position = "<<char_index<<'\n';
-        result_pair<<error<<'\n';
-        result_pair.close();
-        return 0;
+        return empty_tokens;
+        //ofstream result_pair("code_tokens.txt");
+        //result_pair<<"Error position = "<<char_index<<'\n';
+        //result_pair<<error<<'\n';
+        //result_pair.close();
+        //return 0;
     }
-    ofstream result_pair("code_tokens.txt");
-    for(auto t : result_tokens){
-        //cout<<t.second<<"\t\t"<<t.first<<endl;
-        result_pair<<t.first<<"             \t"<<t.second<<'\n';
-    }
-    result_pair.close();
-
-    return 0;
+    return result_tokens;
 }
