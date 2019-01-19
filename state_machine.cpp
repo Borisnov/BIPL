@@ -1,8 +1,8 @@
 #include "bits/stdc++.h"
-#include "extra_files/json.hpp"
+//#include "extra_files/json.hpp"
 
 using namespace std;
-using json = nlohmann::json;
+//using json = nlohmann::json;
 
 ///For more convenient work
 #define DBG(x) cout<<#x<<" = "<<x<<'\n';
@@ -25,13 +25,63 @@ bool find_token(string category, string token){
 
 int main(){
     ///Preparing types from json data file
-    json data_json;
-    ifstream data_types("tokens_types.json");
-    data_types >> data_json;
-    data_types.close();
-    for(json::iterator it = data_json.begin(); it != data_json.end(); ++it){
-        string key = it.key();
-        for(auto t : it.value()){
+    //json data_json;
+    //ifstream data_types("tokens_types.json");
+    //data_types >> data_json;
+    //data_types.close();
+    vector<pair<string, vector<string>>>tokens_initializing = {
+        {"syntax",{
+            "{",
+            "}",
+            "(",
+            ")",
+            "<",
+            ">",
+            ";",
+            ",",
+            "[",
+            "]",
+            "//",
+            "/*",
+            "*/"
+        }},
+        {"operation",{
+            "+",
+            "-",
+            "*",
+            "/",
+            "&",
+            "^",
+            "!",
+            "=",
+            "||",
+            "|",
+            "&&",
+            "%",
+            "==",
+            "++",
+            "--",
+            "+=",
+            "*=",
+            "/=",
+            "%="
+        }},
+        {"reserved_word",{
+            "struct",
+            "for",
+            "while",
+            "if",
+            "else",
+            "return",
+            "catch",
+            "try",
+            "auto"
+        }}
+    };
+
+    for(auto it : tokens_initializing){
+        string key = it.first;
+        for(auto t : it.second){
             string value = t;
             all_tokens.insert(value);
             token_type[value] = key;
