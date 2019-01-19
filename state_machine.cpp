@@ -108,7 +108,7 @@ int main(){
                     add("integer");
                 }
             }else if(state == "float"){
-                if(c >= '0' || c <= '9'){
+                if(c >= '0' && c <= '9'){
                     curr_token += c;
                     char_index ++;
                 }else{
@@ -147,18 +147,20 @@ int main(){
         else if(state == "string")
             throw string("String constant wasn't closed");
         else if(state != "begin")
-            throw string("UNEXPECTED ERROR!");
+            throw string("UNEXPECTED ERROR! state = " + state);
     }catch(string error){
-        cout<<"Error position = "<<char_index<<'\n';
-        cout<<error<<'\n';
+        ofstream result_pair("code_tokens.txt");
+        result_pair<<"Error position = "<<char_index<<'\n';
+        result_pair<<error<<'\n';
+        result_pair.close();
+        return 0;
     }
     ofstream result_pair("code_tokens.txt");
     for(auto t : result_tokens){
-        cout<<t.second<<" "<<t.first<<endl;
-        result_pair<<t.first<<" "<<t.second<<'\n';
+        //cout<<t.second<<"\t\t"<<t.first<<endl;
+        result_pair<<t.first<<"             \t"<<t.second<<'\n';
     }
     result_pair.close();
-
 
     return 0;
 }

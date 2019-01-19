@@ -36,6 +36,7 @@
 		"%="
 	],
 	"reserved_word": [
+		"struct",
 		"for",
 		"while",
 		"if",
@@ -46,3 +47,4 @@
 		"auto"
 	]
 }
+

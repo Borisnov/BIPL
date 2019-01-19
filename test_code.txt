@@ -1,26 +1,11 @@
-bool very_cool_function(bool a, int b){
-	if(a == false)return -b;
-	else{
-		int count = 0;
-		while(b > count)count++, b--;
-		return (count + 23) / 5;
-	}
-}
+int abc(){
 
-int main(){
-	double a = 34;
-	//some comments
-	string st = "some string data";
-	cout << very_cool_function(true, 67);
 	return 0;
-	/*
-	saljdfklsjf
-	dfdsjdsjfejfjg
-	kdsfejfewjfoefwj8988*88888
-	while(true)do something
-	*/
-	for(int i = 0; i < 6; i++){
-		print(4328973.334)
-		cout<<'jfdjfdsfjsdfji "string inside string"';;
+//}
+  /*int main(){
+
+	print("very long string")*/
+	if(a == 7){
+		cout<<78.987+++9;
 	}
-}
+}    
