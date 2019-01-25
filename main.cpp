@@ -25,12 +25,13 @@ int main(){
     ///!!!!!!! FOR BEGIN WORKING
     begining_preparation();
     //cout<<code;
-    vector <pair<string, string>> tokens;
+    //vector <pair<string, string>> tokens;
 
     ///GET TOKENIZING VECTOR
-    tokens = tokenization(code);
+    auto tokens = tokenization(code);
     cout<<tokens.size()<<endl;
     ///VISUALIZING RESULT
+
     for(int i = 0; i < tokens.size(); i++){
         cout<<tokens[i].first<<" "<<tokens[i].second<<'\n';
     }

@@ -65,15 +65,15 @@ vector<pair<string, vector<string>>>tokens_initializing = {
             "double"
          }},
         {"reserved_word",{
-            "struct",
+            "in",
             "for",
             "while",
             "if",
             "else",
             "return",
-            "catch",
-            "try",
-            "auto"
+            "bipl",
+            "break",
+            "continue"
         }}
     };
 ///Start one time before using tokenization function;

@@ -14,7 +14,8 @@ const string TYPE ="type";
 const string BEGINW ="begin_words";
 const string END ="end";
 const string SPESIALS ="operation";
-const vector<string> SPESIALWORD = {"return"};
+const vector<string> ONESPESIALWORD = {"break","continue"};
+const vector<string> SPESIALCOMANDS = {"return","bipl"};
 
 bool new_paramtr();
 bool new_values();
@@ -27,14 +28,20 @@ bool begin_words(){
     return stat == TEXT;
 }
 bool spesial(){
-    for (int i=0;i<SPESIALWORD.size();i++){
-        if(*it == SPESIALWORD[i]){
+    for (int i=0;i<SPESIALCOMANDS.size();i++){
+        if(*it == SPESIALCOMANDS[i]){
             ++it;
             if(*it == NAME || *it == TEXT || *it == INT){
                 ++it;
                 return 1;
             }
             else return  0;
+        }
+    }
+    for (int i=0;i<ONESPESIALWORD.size();i++){
+        if(*it == ONESPESIALWORD[i]){
+            ++it;
+            return 1;
         }
     }
     return 0;
