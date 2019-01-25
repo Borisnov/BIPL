@@ -1,11 +1,9 @@
-int abc(){
 
-	return 0;
-//}
-  /*int main(){
+int main(int t){
 
-	print("very long string")*/
-	if(a == 7){
-		cout<<78.987+++9;
-	}
+	a = 3;
+	a = 3 +4;
+if(a>3){}
+return 0;
+
 }    
