@@ -14,6 +14,7 @@ const string TYPE ="type";
 const string BEGINW ="begin_words";
 const string END ="end";
 const string SPESIALS ="operation";
+const string STRUCT ="struct";
 const vector<string> ONESPESIALWORD = {"break","continue"};
 const vector<string> SPESIALCOMANDS = {"return","bipl"};
 
@@ -27,6 +28,7 @@ bool begin_words(){
     ++it;
     return stat == TEXT;
 }
+//spesial commands
 bool spesial(){
     for (int i=0;i<SPESIALCOMANDS.size();i++){
         if(*it == SPESIALCOMANDS[i]){
@@ -48,9 +50,9 @@ bool spesial(){
 }
 //expression check
 bool expression(){
-    DB("expression");
     bool con =0,r=0;
     while(1){
+        DB("exp: "+*it);
         if( (*it == NAME || *it ==TEXT || *it ==INT) && con == 0){
             con =1;
             r=1;
@@ -69,7 +71,34 @@ bool expression(){
     if(!con && r){
         DBE("expression is not correct")
     }
+    DB("expression");
     return r;
+}
+bool struct_check(){
+    if(*it!=STRUCT){
+        return 0;
+    }
+    ++it;
+    if(*it!=NAME){
+        return 0;
+    }
+    else{
+        DBE("not found `name` in the struct");
+    }
+    ++it;
+    if(*it!="{")return 0;
+    else{
+        DBE("not found `{` in the struct");
+    }
+    ++it;
+    while (new_values()){DB(*it);}
+    if(*it!="}")return 0;
+    else{
+        DBE("not found `}` in the struct");
+    }
+    ++it;
+    return 1;
+
 }
 // if check
 bool ifcheck(){
@@ -164,7 +193,6 @@ bool block(){
             if (!new_values()){
                 return 0;
             };
-            com=1;
         }else
         if(*it =="if"){
             if (!ifcheck()){
@@ -181,13 +209,12 @@ bool block(){
                 return 0;
             };
         } else
-        if(*it ==NAME)
-            if (checkfunk()) {
-                com = 1;
-            }
-        else
-            if (spesial()){
-                com =1;
+        if (checkfunk()) {
+            com = 1;
+        }
+        else if (spesial()){
+
+            com =1;
         }else
         //if it is expression, we need add `;`
         if(expression()){
@@ -205,6 +232,7 @@ bool block(){
             }
             ++it;
         }
+        DB("new word:"+*it);
     }
     ++it;
 
@@ -229,6 +257,7 @@ bool new_values(){
             return 0;
         }
     }
+    ++it;
     return r;
 }
 //parametrs on function
@@ -279,6 +308,9 @@ bool programm(){
 
         if (*it == BEGINW){
             r=r && begin_words();
+        } else
+        if (*it == STRUCT){
+            r=r && struct_check();
         } else
         if (*it == TYPE){
             r=r && funk();

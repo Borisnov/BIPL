@@ -28,8 +28,6 @@ vector<pair<string, vector<string>>>tokens_initializing = {
             "}",
             "(",
             ")",
-            "<",
-            ">",
             ";",
             ",",
             "[",
@@ -52,6 +50,10 @@ vector<pair<string, vector<string>>>tokens_initializing = {
             "&&",
             "%",
             "==",
+            ">",
+            "<",
+            ">=",
+            "<=",
             "++",
             "--",
             "+=",
@@ -73,6 +75,7 @@ vector<pair<string, vector<string>>>tokens_initializing = {
             "return",
             "bipl",
             "break",
+            "struct",
             "continue"
         }}
     };

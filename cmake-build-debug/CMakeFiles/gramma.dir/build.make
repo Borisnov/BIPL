@@ -56,27 +56,27 @@ include CMakeFiles/gramma.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/gramma.dir/flags.make
 
-CMakeFiles/gramma.dir/sintacsis.obj: CMakeFiles/gramma.dir/flags.make
-CMakeFiles/gramma.dir/sintacsis.obj: ../sintacsis.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=E:\programers_files\Projects\BIPL\hardcode\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/gramma.dir/sintacsis.obj"
-	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\gramma.dir\sintacsis.obj -c E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp
+CMakeFiles/gramma.dir/sintacsis.cpp.obj: CMakeFiles/gramma.dir/flags.make
+CMakeFiles/gramma.dir/sintacsis.cpp.obj: ../sintacsis.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=E:\programers_files\Projects\BIPL\hardcode\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/gramma.dir/sintacsis.cpp.obj"
+	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\gramma.dir\sintacsis.cpp.obj -c E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp
 
-CMakeFiles/gramma.dir/sintacsis.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gramma.dir/sintacsis.i"
-	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp > CMakeFiles\gramma.dir\sintacsis.i
+CMakeFiles/gramma.dir/sintacsis.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/gramma.dir/sintacsis.cpp.i"
+	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp > CMakeFiles\gramma.dir\sintacsis.cpp.i
 
-CMakeFiles/gramma.dir/sintacsis.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gramma.dir/sintacsis.s"
-	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp -o CMakeFiles\gramma.dir\sintacsis.s
+CMakeFiles/gramma.dir/sintacsis.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/gramma.dir/sintacsis.cpp.s"
+	C:\PROGRA~2\MINGW-~1\I686-8~1.0-P\mingw32\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\programers_files\Projects\BIPL\hardcode\sintacsis.cpp -o CMakeFiles\gramma.dir\sintacsis.cpp.s
 
 # Object files for target gramma
 gramma_OBJECTS = \
-"CMakeFiles/gramma.dir/sintacsis.obj"
+"CMakeFiles/gramma.dir/sintacsis.cpp.obj"
 
 # External object files for target gramma
 gramma_EXTERNAL_OBJECTS =
 
-gramma.exe: CMakeFiles/gramma.dir/sintacsis.obj
+gramma.exe: CMakeFiles/gramma.dir/sintacsis.cpp.obj
 gramma.exe: CMakeFiles/gramma.dir/build.make
 gramma.exe: CMakeFiles/gramma.dir/linklibs.rsp
 gramma.exe: CMakeFiles/gramma.dir/objects1.rsp

@@ -110,19 +110,6 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named main
-
-# Build rule for target.
-main: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 main
-.PHONY : main
-
-# fast build rule for target.
-main/fast:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/build
-.PHONY : main/fast
-
-#=============================================================================
 # Target rules for targets named gramma
 
 # Build rule for target.
@@ -135,63 +122,32 @@ gramma/fast:
 	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/build
 .PHONY : gramma/fast
 
-#=============================================================================
-# Target rules for targets named test
+sintacsis.obj: sintacsis.cpp.obj
 
-# Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles\Makefile2 test
-.PHONY : test
-
-# fast build rule for target.
-test/fast:
-	$(MAKE) -f CMakeFiles\test.dir\build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
-
-# target to build an object file
-main.obj:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/main.obj
-.PHONY : main.obj
-
-# target to preprocess a source file
-main.i:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/main.i
-.PHONY : main.i
-
-# target to generate assembly for a file
-main.s:
-	$(MAKE) -f CMakeFiles\main.dir\build.make CMakeFiles/main.dir/main.s
-.PHONY : main.s
-
-# target to build an object file
-sintacsis.obj:
-	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.obj
 .PHONY : sintacsis.obj
 
-# target to preprocess a source file
-sintacsis.i:
-	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.i
+# target to build an object file
+sintacsis.cpp.obj:
+	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.cpp.obj
+.PHONY : sintacsis.cpp.obj
+
+sintacsis.i: sintacsis.cpp.i
+
 .PHONY : sintacsis.i
 
-# target to generate assembly for a file
-sintacsis.s:
-	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.s
+# target to preprocess a source file
+sintacsis.cpp.i:
+	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.cpp.i
+.PHONY : sintacsis.cpp.i
+
+sintacsis.s: sintacsis.cpp.s
+
 .PHONY : sintacsis.s
 
-# target to build an object file
-tasks.obj:
-	$(MAKE) -f CMakeFiles\test.dir\build.make CMakeFiles/test.dir/tasks.obj
-.PHONY : tasks.obj
-
-# target to preprocess a source file
-tasks.i:
-	$(MAKE) -f CMakeFiles\test.dir\build.make CMakeFiles/test.dir/tasks.i
-.PHONY : tasks.i
-
 # target to generate assembly for a file
-tasks.s:
-	$(MAKE) -f CMakeFiles\test.dir\build.make CMakeFiles/test.dir/tasks.s
-.PHONY : tasks.s
+sintacsis.cpp.s:
+	$(MAKE) -f CMakeFiles\gramma.dir\build.make CMakeFiles/gramma.dir/sintacsis.cpp.s
+.PHONY : sintacsis.cpp.s
 
 # Help Target
 help:
@@ -200,19 +156,11 @@ help:
 	@echo ... clean
 	@echo ... depend
 	@echo ... edit_cache
-	@echo ... main
 	@echo ... gramma
 	@echo ... rebuild_cache
-	@echo ... test
-	@echo ... main.obj
-	@echo ... main.i
-	@echo ... main.s
 	@echo ... sintacsis.obj
 	@echo ... sintacsis.i
 	@echo ... sintacsis.s
-	@echo ... tasks.obj
-	@echo ... tasks.i
-	@echo ... tasks.s
 .PHONY : help
 
 
