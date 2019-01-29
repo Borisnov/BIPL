@@ -1,9 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/gramma.dir/sintacsis.obj"
+  "CMakeFiles/gramma.dir/sintacsis.cpp.obj"
   "gramma.pdb"
   "gramma.exe"
   "gramma.exe.manifest"
-  "libgramma.dll.a"
+  "gramma.lib"
 )
 
 # Per-language clean rules from dependency scanning.

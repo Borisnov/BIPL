@@ -1,5 +1,5 @@
-E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/edit_cache.dir
-E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/main.dir
-E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/gramma.dir
-E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/test.dir
+C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/main.dir
+C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/gramma.dir
+C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/test.dir

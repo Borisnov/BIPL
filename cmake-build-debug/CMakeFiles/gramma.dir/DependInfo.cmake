@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "E:/programers_files/Projects/BIPL/hardcode/sintacsis.cpp" "E:/programers_files/Projects/BIPL/hardcode/cmake-build-debug/CMakeFiles/gramma.dir/sintacsis.obj"
+  "C:/Users/boris/Projects/BIPL/sintacsis.cpp" "C:/Users/boris/Projects/BIPL/cmake-build-debug/CMakeFiles/gramma.dir/sintacsis.cpp.obj"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "MSVC")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
