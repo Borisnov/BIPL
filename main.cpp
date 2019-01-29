@@ -32,7 +32,7 @@ int main(){
     cout<<tokens.size()<<endl;
     ///VISUALIZING RESULT
 
-    for(int i = 0; i < tokens.size(); i++){
+    for ( int i = 0; i < tokens.size(); i++){
         cout<<tokens[i].first<<" "<<tokens[i].second<<'\n';
     }
     cout<<endl;
