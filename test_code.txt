@@ -4,7 +4,7 @@ struct s{
 	float b; 
 }
 
-int main(int t){
+int main(int t)
 	int a , f;
 	a = 3;
 	a = 3 + 4;
