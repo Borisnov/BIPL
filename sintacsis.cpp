@@ -290,11 +290,11 @@ bool funk(){
         return 0;
     };
     ++it;
-
-    if(*it==NAME and *( ++it )=="("){
-        ++it;
-        r=r && new_paramtr();
-    }
+    if(*it!=NAME)return 0;
+    ++it;
+    if(*it!="(")return 0;
+    ++it;
+    r=r && new_paramtr();
 
     r=r&& block();
 
@@ -314,12 +314,14 @@ bool programm(){
         } else
         if (*it == TYPE){
             r=r && funk();
+            if(!r)DBE("fuction is not correct");
         }
         else if(*it ==END)return r;
         else {
             DBE(*it);
             return 0;
         }
+        if(!r)return 0;
     }
 
     return r;
