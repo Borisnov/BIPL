@@ -80,7 +80,7 @@ vector<pair<string, vector<string>>>tokens_initializing = {
         }}
     };
 ///Start one time before using tokenization function;
-void begining_preparation(){
+void beginning_preparation(){
     ///Preparing types from json data file
     //json data_json;
     //ifstream data_types("tokens_types.json");
