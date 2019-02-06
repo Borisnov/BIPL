@@ -16,8 +16,8 @@ const string BEGINW = "begin_words";
 const string END = "end";
 const string OPERATION = "operation";
 const string STRUCT = "struct";
-const vector<string> ONESPESIALWORD = {"break" , "continue"};
-const vector<string> SPESIALCOMANDS = {"return" , "bipl"};
+const set<string> LOOPSPECIOAL = {"break" , "continue"};
+const set<string> FUNCSPECIAL = {"return"};
 
 
 
@@ -25,9 +25,10 @@ const vector<string> SPESIALCOMANDS = {"return" , "bipl"};
 vector<token>::iterator it , end_it;
 string type, value;
 
-void new_paramtr();
 void new_variable();
 void block();
+void one_action();
+bool try_start(void (*f)());
 
 void next(){
     if(it == end_it){
@@ -78,6 +79,7 @@ bool expression() {
 void structcheck() {
     check_current("struct");
     if(type != TYPE) throw "Skipped name of struct";
+    next();
     check_current("{");
     while(type != "}")
         new_variable();
@@ -92,29 +94,33 @@ bool ifcheck() {
     check_current(")");
     if( value == "{")
         block();
-    else{
+    else
         one_action();
+
+    if(value == "else"){
+        next();
+        if(value == "{")
+            block();
+        else
+            one_action();
     }
 }
-
+void check_type(string need_type){
+    if(type != need_type)
+        throw "Unexpected token type";
+    next();
+}
 //for
-bool forcheck() {
-    DB("for");
-    if (*it != "for")return 0;
-    ++it;
-    if (*it != "(")return 0;
-    ++it;
-    if (*it != NAME)return 0;
-    ++it;
-    if (*it != "in")return 0;
-    ++it;
-    if (*it != NAME)return 0;
-    ++it;
-    if (*it != ")")return 0;
-    ++it;
-
-    return block();
-
+void forcheck() {
+    check_current("for");
+    check_current("(");
+    expression();
+    check_current(";");
+    expression();
+    check_current(";");
+    expression();
+    check_current(";");
+    block();
 }
 
 //while
@@ -151,11 +157,16 @@ void funccheck() {
     check_current(")");
     block();
 }
+void expressiong_action(){
+    expression();
+    check_current(";");
+}
 void one_action(){
     if(value == "if") ifcheck();
     else if(value == "for") forcheck();
     else if(value == "while") whilecheck();
     else if(type == TYPE) new_variable();
+    else expressiong_action();
 }
 
 void block() {
@@ -185,10 +196,15 @@ void new_variable() {
     }
 }
 
+bool try_start(void (*f)()){
+    try{
+        f();
+        return true;
+    }catch(...){
+        return false;
+    }
+}
 
-
-
-//check program_body
 void program_body() {
     while (it < end_it) {
         if (value == STRUCT) structcheck();
