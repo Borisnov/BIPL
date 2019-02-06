@@ -7,15 +7,33 @@ using namespace std;
 ///For more convenient work
 #define DBG(x) cout<<#x<<" = "<<x<<'\n';
 
+struct token{
+    string value;
+    string type;
+    int string_num;
+    int pos_num;
+};
+
 map< string, set <string> >tokens_in_category;
-vector<pair<string, string> >result_tokens;
+vector< token >result_tokens;
 string curr_token = "";
 set<string>all_tokens;
 map<string, string>token_type;
+int string_number;
+int begin_line_char;
+int char_index = 0;
 
 
 void add(string type){
-    result_tokens.push_back(make_pair(type, curr_token));
+    token x;
+
+    x.string_num = string_number;
+    x.type = type;
+    x.value = curr_token;
+    x.pos_num = char_index - begin_line_char;
+
+    result_tokens.push_back(x);
+
     curr_token = "";
 }
 
@@ -99,16 +117,18 @@ void beginning_preparation(){
     }
 }
 ///main function to tokenizing code string
-vector<pair<string, string>> tokenization(string code){
+vector<token> tokenization(string code){
     code += '\n';
-    vector<pair<string, string>>empty_tokens;
+    vector<token>empty_tokens;
     ///Initializing all necessary
     result_tokens.clear();
     curr_token = "";
     int code_length = code.length();
-    int char_index = 0;
+    char_index = 0;
 
     string state = "begin";
+    string_number = 0;
+    begin_line_char = 0;
     char c;
     ///Loop of whole code string
     try{
@@ -117,6 +137,10 @@ vector<pair<string, string>> tokenization(string code){
 
             if(state == "begin"){
                 if(c == ' ' || c == '\n' || c == '\t'){
+                    if(c == '\n'){
+                        string_number ++;
+                        begin_line_char = char_index;
+                    }
                     char_index ++;
                 }else if(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c == '_')
                     state = "name";
@@ -218,19 +242,3 @@ vector<pair<string, string>> tokenization(string code){
     return result_tokens;
 }
 
-string syntax_string(string code){
-    vector <pair<string, string>> tokens;
-
-    ///GET TOKENIZING VECTOR
-    tokens = tokenization(code);
-    string res= "";
-    for(auto token : tokens){
-        if(token.first == "reserved_word" || token.first == "syntax"){
-            res += token.second;
-        }else{
-            res += token.first;
-        }
-        res += ' ';
-    }
-    return res;
-}
