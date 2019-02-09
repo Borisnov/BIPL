@@ -1,5 +1,4 @@
-
 int main(int abc){
     int a;
-    a = 9;
+    a = 'afdsfdsfds';
 }

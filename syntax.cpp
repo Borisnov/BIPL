@@ -12,8 +12,6 @@ const string TEXT = "text";
 const string NAME = "name";
 const string INT = "integer";
 const string TYPE = "type";
-const string BEGINW = "begin_words";
-const string END = "end";
 const string OPERATION = "operation";
 const string STRUCT = "struct";
 const set<string> LOOPSPECIOAL = {"break" , "continue"};
@@ -31,11 +29,13 @@ void one_action();
 bool try_start(void (*f)());
 
 void next(){
+//    cout<<"next called\n";
     if(it == end_it){
         throw "Unexpected end of file";
     }
     ++it;
     if(it == end_it){
+//        throw "End of file";
         type = "END_OF_FILE";
         value = "END_OF_FILE";
         return;
@@ -46,34 +46,33 @@ void next(){
 }
 void check_current(string need_value){
     if(value != need_value){
-        throw "Unexpected token " + value;
+        throw ("Unexpected token " + value +
+            ", expected to see " + need_value).c_str();
     }
     next();
 }
-
+int curr_token_type(){
+    if(type == TEXT || type == INT || type == NAME)
+        return 1;
+    if(type == OPERATION)
+        return 0;
+    return 2;
+}
 //expression check
-bool expression() {
-    bool state = 1;
-    while (true) {
-        if(state)
-        DB("exp: " + *it);
-        if ((*it == NAME || *it == TEXT || *it == INT) && con == 0) {
-            con = 1;
-            r = 1;
-            ++it;
-        } else if (con == 1 and *it == OPERATION) {
-            con = 0;
-            r = 1;
-            ++it;
-        } else {
-            break;
-        }
+void expression() {
+    bool b = true;
+    if(curr_token_type() != 1)
+        throw "Wrong expression";
+    while(curr_token_type() <= 1) {
+        if(b && curr_token_type() != 1)
+            throw "Wrong expression constant";
+        else if(!b && curr_token_type() != 0)
+            throw "Wrong expression operator";
+        next();
+        b = !b;
     }
-    if (!con && r) {
-        DBE("expression is not correct")
-    }
-    DB("expression");
-    return r;
+    if(b)
+        throw "Wrong end of expression";
 }
 
 void structcheck() {
@@ -87,7 +86,7 @@ void structcheck() {
 }
 
 
-bool ifcheck() {
+void ifcheck() {
     check_current("if");
     check_current("(");
     expression();
@@ -119,7 +118,6 @@ void forcheck() {
     expression();
     check_current(";");
     expression();
-    check_current(";");
     block();
 }
 
@@ -138,8 +136,7 @@ void function_parameters() {
         next();
         if(type != NAME) throw "Wrong function parameter name";
         next();
-        if(value == "}"){
-            next();
+        if(value == ")"){
             return;
         }
         if(value != ",") throw "Unexpected symbol in function parameters";
@@ -157,7 +154,7 @@ void funccheck() {
     check_current(")");
     block();
 }
-void expressiong_action(){
+void expression_action(){
     expression();
     check_current(";");
 }
@@ -166,15 +163,15 @@ void one_action(){
     else if(value == "for") forcheck();
     else if(value == "while") whilecheck();
     else if(type == TYPE) new_variable();
-    else expressiong_action();
+    else expression_action();
 }
 
 void block() {
     check_current("{");
-
     while (value != "}") {
         one_action();
     }
+    check_current("}");
 }
 
 void new_variable() {
@@ -209,12 +206,12 @@ void program_body() {
     while (it < end_it) {
         if (value == STRUCT) structcheck();
         else if (type == TYPE) funccheck();
-        else throw "Unexpected token " + value;
+        else throw ("Unexpected token " + value).c_str();
     }
 }
 
 string read_file(string name) {
-    ifstream code_file("test_code.txt");
+    ifstream code_file(name);
     string code = "";
     char c;
     while (code_file.get(c)) {
@@ -226,7 +223,7 @@ string read_file(string name) {
 ///Full compilation
 int main() {
     string code = read_file("test_code.txt");
-    //DBG(code);
+    cout<<code<<endl;
     beginning_preparation();
 
     vector < token > tokens;
@@ -235,6 +232,10 @@ int main() {
 
     it = tokens.begin();
     end_it = tokens.end();
+    if(it == end_it){
+        cout<<"Code is empty";
+        return 0;
+    }
     value = it->value;
     type = it->type;
 
@@ -243,8 +244,19 @@ int main() {
     }
     catch (const char* error) {
         cout << "ERROR" << '\n';
-        cout << error;
+        if(it >= end_it){
+            cout<<"Error has occurred at the end of file\n";
+        }else{
+            cout<<"Error has occurred at"
+            <<"\nString num: "<<it->string_num
+            <<" character number: "<<it->pos_num
+            <<"\nToken = "<<value<<" token_type = "<<type;
+            cout<<"\n\n";
+        }
+        cout << error<<'\n';
+        return 0;
     }
+    cout<<"SUCCESS COMPILING!";
 
 
 }

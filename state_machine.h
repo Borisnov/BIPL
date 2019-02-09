@@ -127,7 +127,7 @@ vector<token> tokenization(string code){
     char_index = 0;
 
     string state = "begin";
-    string_number = 0;
+    string_number = 1;
     begin_line_char = 0;
     char c;
     ///Loop of whole code string
