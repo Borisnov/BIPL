@@ -122,32 +122,32 @@ program/fast:
 	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/build
 .PHONY : program/fast
 
-syntax.obj: syntax.cpp.obj
+start.obj: start.cpp.obj
 
-.PHONY : syntax.obj
+.PHONY : start.obj
 
 # target to build an object file
-syntax.cpp.obj:
-	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/syntax.cpp.obj
-.PHONY : syntax.cpp.obj
+start.cpp.obj:
+	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/start.cpp.obj
+.PHONY : start.cpp.obj
 
-syntax.i: syntax.cpp.i
+start.i: start.cpp.i
 
-.PHONY : syntax.i
+.PHONY : start.i
 
 # target to preprocess a source file
-syntax.cpp.i:
-	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/syntax.cpp.i
-.PHONY : syntax.cpp.i
+start.cpp.i:
+	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/start.cpp.i
+.PHONY : start.cpp.i
 
-syntax.s: syntax.cpp.s
+start.s: start.cpp.s
 
-.PHONY : syntax.s
+.PHONY : start.s
 
 # target to generate assembly for a file
-syntax.cpp.s:
-	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/syntax.cpp.s
-.PHONY : syntax.cpp.s
+start.cpp.s:
+	$(MAKE) -f CMakeFiles\program.dir\build.make CMakeFiles/program.dir/start.cpp.s
+.PHONY : start.cpp.s
 
 # Help Target
 help:
@@ -158,9 +158,9 @@ help:
 	@echo ... program
 	@echo ... edit_cache
 	@echo ... rebuild_cache
-	@echo ... syntax.obj
-	@echo ... syntax.i
-	@echo ... syntax.s
+	@echo ... start.obj
+	@echo ... start.i
+	@echo ... start.s
 .PHONY : help
 
 

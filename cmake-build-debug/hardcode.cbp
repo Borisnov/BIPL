@@ -80,7 +80,7 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="C:/Users/boris/Projects/BIPL/syntax.cpp">
+		<Unit filename="C:/Users/boris/Projects/BIPL/start.cpp">
 			<Option target="program"/>
 		</Unit>
 		<Unit filename="C:/Users/boris/Projects/BIPL/CMakeLists.txt">

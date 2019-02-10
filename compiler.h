@@ -1,10 +1,6 @@
 #include "bits/stdc++.h"
 #include "state_machine.h"
-#include "../../../../Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.14.26428/include/utility"
 
-#define DB(x) cout<<(x)<<"\n";
-#define DBE(x) cout<<"Error: "<<(x)<<"\n";
-#define DBG(x) cout<<#x<<" = "<<x<<'\n';
 using namespace std;
 
 const string TEXT = "text";
@@ -21,15 +17,17 @@ string type, value;
 void new_variable();
 void block();
 void one_action();
-//bool try_start(void (*f)());
 
 ///build poliz
+
 struct poliz_unit{
     string status;
     string type;
     string value;
 };
-vector<pair<string, string>>poliz;
+vector<poliz_unit>poliz;
+vector<int>break_loop;
+int last_loop_begin;
 
 void poliz_add(string status, string type, string value){
     poliz_unit action;
@@ -42,12 +40,23 @@ void poliz_jump_here(int index){
     poliz[index].value = to_string(poliz.size());
 }
 
+void poliz_break_here() {
+    for(int i = 0; i < break_loop.size(); i++){
+        poliz_jump_here(break_loop[i]);
+    }
+    break_loop.clear();
+}
+
 ///semantic functions
 
 string curr_function_return_value = "void";
 vector<map<string, string>> variables (1);  ///find index of var by its name;
 map<string, string>var_type; /// find type of var by its index;
 map<string, vector<string>>functions_types;
+vector<string>parents = {"main"};
+
+bool was_return_value;
+int variable_index = 0;
 
 void add_function(string name, string type){
     vector<string>t;
@@ -63,14 +72,11 @@ void add_empty_visibility_area(){
     variables.push_back(a);
 }
 
-void delete_last_visabiliy_area(){
+void delete_last_visibility_area(){
     variables.back().clear();
     variables.pop_back();
 }
 
-vector<string>parents = {"main"};
-//bool visibility_area;
-int variable_index = 0;
 string new_var_index(){
     string index = "var_" + to_string(variable_index);
     variable_index ++;
@@ -85,7 +91,7 @@ void add_variable(string name, string type){
     var_type[new_index] = type;
 }
 
-string get_var_index(string name){
+string check_veriable(string name){
     for(int i = variables.size() - 1; i >= 0; i--){
         if(variables[i].find(name) != variables[i].end()){
             return variables[i][name];
@@ -110,6 +116,7 @@ void next(){
     type = it->type;
     value = it->value;
 }
+
 void check_current(string need_value){
     if(value != need_value){
         throw ("Unexpected token " + value +
@@ -117,10 +124,13 @@ void check_current(string need_value){
     }
     next();
 }
-pair<string, string> token_accurate_type(){
-    if(type == TEXT)
+
+/// main part of recursive descent
+
+pair<bool, string> token_accurate_type(){
+    if(type == TEXT){}
 }
-//expression check
+
 string expression() {
     bool begin = true;
     vector<string>stack;
@@ -161,7 +171,7 @@ string expression() {
                         stack.pop_back();
                         break;
                     }
-                    poliz_add("execute", "", "")
+                    poliz_add("execute", "", "");
                 }
             }
         }
@@ -185,7 +195,6 @@ void struct_check() {
         new_variable();
     check_current("}");
 }
-
 
 void if_check() {
     check_current("if");
@@ -221,7 +230,9 @@ void if_check() {
 }
 
 void for_check() {
+    parents.push_back("for");
     add_empty_visibility_area();
+
     check_current("for");
     check_current("(");
     new_variable();
@@ -231,6 +242,7 @@ void for_check() {
     poliz_add("execute", "", "transition_abs");
 
     int loop_begin_point = poliz.size();
+    last_loop_begin = loop_begin_point;
     expression();
     check_current(";");
     poliz_jump_here(skip_action_expression);
@@ -247,9 +259,15 @@ void for_check() {
     poliz_add("value", "int", to_string(loop_begin_point));
     poliz_add("execute", "", "transition_abs");
     poliz_jump_here(skip_loop_block);
+    poliz_break_here();
+    parents.pop_back();
 }
 
 void while_check() {
+    parents.push_back("while");
+    int begin_while_loop = poliz.size();
+    last_loop_begin = begin_while_loop;
+
     check_current("while");
     check_current("(");
     string exp_type = expression();
@@ -262,7 +280,12 @@ void while_check() {
     poliz_add("execute", "", "transition_lie");
     block();
 
+    poliz_add("value", "int", to_string(begin_while_loop));
+    poliz_add("execute", "", "transition_abs");
+
+    poliz_break_here();
     poliz_jump_here(skip_while_block);
+    parents.pop_back();
 }
 
 void function_parameters(string func_name) {
@@ -281,6 +304,7 @@ void function_parameters(string func_name) {
 }
 
 void func_check() {
+    was_return_value = false;
     parents.push_back("func");
     add_empty_visibility_area();
 
@@ -300,7 +324,11 @@ void func_check() {
 
     block();
     curr_function_return_value = "void";
-    delete_last_visabiliy_area();
+    delete_last_visibility_area();
+    parents.pop_back();
+
+    if(curr_function_return_value != "void" && !was_return_value)
+        throw "This function must return some value";
 }
 
 void expression_action(){
@@ -308,31 +336,41 @@ void expression_action(){
     check_current(";");
 }
 
+void break_check() {
+    string parent = parents.back();
+    if(!(parent == "while" || parent == "for")){
+        throw "Break can be only in while or for loop";
+    }
+    check_current(";");
+    break_loop.push_back(poliz.size());
+    poliz_add("value", "int", "");
+    poliz_add("execute", "", "transition_abs");
+}
+
+void continue_check(){
+    string parent = parents.back();
+    if(!(parent == "while" || parent == "for")){
+        throw "continue can be only in while or for loop";
+    }
+    poliz_add("value", "int", to_string(last_loop_begin));
+    poliz_add("execute", "", "transition_abs");
+}
+
+void return_check(){
+    was_return_value = true;
+    if(curr_function_return_value != "void"){
+        string exp_type = expression();
+    }
+    check_current(";");
+}
+
 void one_action(){
     if(value == "if") if_check();
     else if(value == "for") for_check();
     else if(value == "while") while_check();
-    else if(value == "break"){
-        string parent = parents.back();
-        if(!(parent == "while" || parent == "for")){
-            throw "Break can be only in while or for loop";
-        }
-        check_current(";");
-    }
-    else if(value == "continue"){
-        string parent = parents.back();
-        if(!(parent == "while" || parent == "for")){
-            throw "Break can be only in while or for loop";
-        }
-        check_current(";");
-    }
-    else if(value == "return"){
-        if(curr_function_return_value == "void"){
-        }else{
-            string exp_type = expression();
-        }
-        check_current(";");
-    }
+    else if(value == "break") break_check();
+    else if(value == "continue")continue_check();
+    else if(value == "return")return_check();
     else if(type == TYPE) new_variable();
     else expression_action();
 }
@@ -352,13 +390,14 @@ void new_variable() {
     while (true) {
         if(type != NAME) throw "Expected variable name";
         string var_name = value;
+        add_variable(var_name, var_type);
+
         next();
         if(value == "="){
             next();
             string val_type = expression();
             if(val_type != var_type)
                 throw "Value of variable must be the same type as variable";
-            add_item(var_name, )
         }
         if(value == ";"){
             next();
@@ -382,31 +421,30 @@ void program_body() {
     }
 }
 
-string read_file(string name) {
-    ifstream code_file(name);
-    string code = "";
-    char c;
-    while (code_file.get(c)) {
-        code += c;
-    }
-    code_file.close();
-    return code;
-}
+
+
+
+struct result_report{
+    bool was_error = false;
+    string error;
+    int line;
+    int position;
+    string error_token;
+};
+
 ///Full compilation
-int main() {
-    string code = read_file("test_code.txt");
-    cout<<code<<endl;
+result_report compile(string code) {
+    result_report report;
+
     beginning_preparation();
-
     vector < token > tokens;
-
     tokens = tokenization(code);
 
     it = tokens.begin();
     end_it = tokens.end();
+
     if(it == end_it){
-        cout<<"Code is empty";
-        return 0;
+        return report;
     }
     value = it->value;
     type = it->type;
@@ -415,20 +453,15 @@ int main() {
         program_body();
     }
     catch (const char* error) {
-        cout << "ERROR" << '\n';
-        if(it >= end_it){
-            cout<<"Error has occurred at the end of file\n";
-        }else{
-            cout<<"Error has occurred at"
-            <<"\nString num: "<<it->string_num
-            <<" character number: "<<it->pos_num
-            <<"\nToken = "<<value<<" token_type = "<<type;
-            cout<<"\n\n";
-        }
-        cout << error<<'\n';
-        return 0;
+        report.was_error = true;
+        report.error = error;
+
+        if(it >= end_it)
+            it = --end_it;
+
+        report.line = it->string_num;
+        report.position = it->pos_num;
+        report.error_token = it->value;
     }
-    cout<<"SUCCESS COMPILING!" << '\n';
-
-
+    return report;
 }
