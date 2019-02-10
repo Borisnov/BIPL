@@ -2,7 +2,11 @@ struct node{
     int a = 1;
     int b, c, d;
 }
-int main(int abc){
+int some_func(int abc){
     int a;
     a = 'afdsfdsfds';
+}
+{
+    a = 3;
+    b = 5;
 }
