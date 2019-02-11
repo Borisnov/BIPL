@@ -36,6 +36,15 @@ void poliz_add(string status, string type, string value){
     action.value = value;
 }
 
+poliz_unit check_poliz(int begin, int k){
+    if(k < begin)
+        throw "Expression begin error";
+    if(k >= poliz.size()){
+        throw "Error checking old tokens";
+    }
+    return poliz[poliz.size() - 1 - k];
+}
+
 void poliz_jump_here(int index){
     poliz[index].value = to_string(poliz.size());
 }
@@ -51,7 +60,7 @@ void poliz_break_here() {
 
 string curr_function_return_value = "void";
 vector<map<string, string>> variables (1);  ///find index of var by its name;
-map<string, string>var_type; /// find type of var by its index;
+map<string, string>get_var_type; /// find type of var by its index;
 map<string, vector<string>>functions_types;
 vector<string>parents = {"main"};
 
@@ -88,10 +97,10 @@ void add_variable(string name, string type){
     }
     string new_index = new_var_index();
     variables.back()[name] = new_index;
-    var_type[new_index] = type;
+    get_var_type[new_index] = type;
 }
 
-string check_veriable(string name){
+string check_variable(string name){
     for(int i = variables.size() - 1; i >= 0; i--){
         if(variables[i].find(name) != variables[i].end()){
             return variables[i][name];
@@ -127,39 +136,59 @@ void check_current(string need_value){
 
 /// main part of recursive descent
 
-pair<bool, string> token_accurate_type(){
-    if(type == TEXT){}
+// for expression building
+int op_priority(string op){
+    if(op == "||") return 1;
+    if(op == "&&") return 2;
+    if(op == "==" || op == "!=") return 3;
+    if(op == "+" || op == "-") return 4;
+    if(op == "*" || op == "/") return 5;
+    return -1;
+}
+
+string curr_token_status(){
+    string t = value;
+    if(type == TEXT || type == INT) return "begin";
+    if(type == NAME) return "begin";
+    if(t == "++" || t == "--") return "post";
+    if(t == "+=" || t == "-=") return "equal";
+    if(t == "*=" || t == "/=") return "equal";
+    if(op_priority(value) != -1) return "operation";
+    return "not_expression";
 }
 
 string expression() {
-    bool begin = true;
+    bool must_value = true;
     vector<string>stack;
-    int expressiong_begin = poliz.size();
+    int expression_begin = poliz.size();
     while(true) {
-        pair<string, string>curr_token = token_accurate_type();
-
-        if(begin){
-            if(curr_token.first == "value"){
-                if(curr_token.second == "var") {
-                    check_item(value);
-                }else if(curr_token.second == "value"){
-                    poliz_add("value", type, value);
-                }else if(curr_token.second == "func"){
-
+        string status = curr_token_status();
+        //begin not_expression post equal operation
+        if(status == "not_expression")
+            break;
+        if(must_value){
+            if(status == "begin"){
+                if(type == NAME){
+                    string ind = check_variable(value);
+                    poliz_add("ptr", get_var_type[ind], ind);
+                }else if(type == INT){
+                    poliz_add("value", "int", value);
+                }else if(type == TEXT){
+                    poliz_add("value", "string", value);
                 }
+                must_value = false;
             }else if(value == "-"){
-                stack.push_back("b-");
+                stack.push_back("bm");
             }else if(value == "("){
                 stack.push_back(value);
             }else{
                 throw "Wrong expression";
             }
-            begin = !begin;
             next();
         }else{
-            if(curr_token.first == "post") {
-                string last_var_type = check_poliz(0).type;
-                if(){
+            if(status == "post") {
+                string last_token_status = check_poliz(expression_begin, 0).status;
+                if(last_token_status == "ptr"){
                     poliz_add("execute" , "" , value);
                 }else
                     throw "Incorrect use of postfix operations";
@@ -171,19 +200,46 @@ string expression() {
                         stack.pop_back();
                         break;
                     }
-                    poliz_add("execute", "", "");
+                    poliz_add("execute", "operation", stack.back());
                 }
+            }else if(status == "equal"){
+                //return branch
+                string curr_val = value;
+                if(stack.size() != 0)
+                    throw "Before equal operation must be only one variable";
+                poliz_unit last = check_poliz(expression_begin, 0);
+                if(last.status != "ptr")
+                    throw "Before equal operation must be variable";
+                string res_type = expression();
+                if(res_type != last.type)
+                    throw "Wrong type of equal statement";
+                else{
+                    poliz_add("execute", "equal", curr_val);
+                    return res_type;
+                }
+
+            }else{
+                must_value = true;
+                int curr_prior = op_priority(value);
+                while(op_priority(stack.back()) > curr_prior){
+                    poliz_add("execute", "operation", stack.back());
+                    stack.pop_back();
+                }
+                stack.push_back(value);
             }
         }
-        if(b && token_accurate_type() != 1)
-            throw "Wrong expression constant";
-        else if(!b && token_accurate_type() != 0)
-            throw "Wrong expression operator";
         next();
-        b = !b;
     }
-    if(b)
+    if(must_value)
         throw "Wrong end of expression";
+
+    while(stack.size()){
+        poliz_add("execute", "", stack.back());
+        stack.pop_back();
+    }
+
+    ////check types of all operation operators
+    
 }
 
 void struct_check() {
