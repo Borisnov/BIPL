@@ -117,7 +117,7 @@ void beginning_preparation(){
     }
 }
 ///main function to tokenizing code string
-vector<token> tokenization(string code){
+pair<string, vector<token>> tokenization(string code){
     code += '\n';
     vector<token>empty_tokens;
     ///Initializing all necessary
@@ -207,7 +207,7 @@ vector<token> tokenization(string code){
                     curr_token += c;
                     char_index ++;
                     state = "begin";
-                    add("text");
+                    add("string");
                 }
             }else if(state == "name"){
                 if(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' ||
@@ -232,13 +232,14 @@ vector<token> tokenization(string code){
         else if(state != "begin")
             throw string("UNEXPECTED ERROR! state = " + state);
     }catch(string error){
-        return empty_tokens;
+        error += " ";
+        return make_pair(error, empty_tokens);
         //ofstream result_pair("code_tokens.txt");
         //result_pair<<"Error position = "<<char_index<<'\n';
         //result_pair<<error<<'\n';
         //result_pair.close();
         //return 0;
     }
-    return result_tokens;
+    return make_pair("", result_tokens);
 }
 

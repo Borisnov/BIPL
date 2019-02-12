@@ -3,7 +3,9 @@
 
 using namespace std;
 
-const string TEXT = "text";
+#define DBG(x) cout << "DBG output : "<<#x << " = " << x << endl;
+
+const string TEXT = "string";
 const string NAME = "name";
 const string INT = "integer";
 const string TYPE = "type";
@@ -34,10 +36,11 @@ void poliz_add(string status, string type, string value){
     action.status = status;
     action.type = type;
     action.value = value;
+    poliz.push_back(action);
 }
 
 poliz_unit check_poliz(int begin, int k){
-    if(k < begin)
+    if(poliz.size() - 1 - k < begin)
         throw "Expression begin error";
     if(k >= poliz.size()){
         throw "Error checking old tokens";
@@ -89,6 +92,7 @@ void delete_last_visibility_area(){
 string new_var_index(){
     string index = "var_" + to_string(variable_index);
     variable_index ++;
+    return index;
 }
 
 void add_variable(string name, string type){
@@ -128,8 +132,7 @@ void next(){
 
 void check_current(string need_value){
     if(value != need_value){
-        throw ("Unexpected token " + value +
-            ", expected to see " + need_value).c_str();
+        throw "Unexpected token detected";
     }
     next();
 }
@@ -141,8 +144,10 @@ int op_priority(string op){
     if(op == "||") return 1;
     if(op == "&&") return 2;
     if(op == "==" || op == "!=") return 3;
-    if(op == "+" || op == "-") return 4;
-    if(op == "*" || op == "/") return 5;
+    if(op == ">" || op == "<" || op == ">=" || op == "<=")
+        return 4;
+    if(op == "+" || op == "-") return 5;
+    if(op == "*" || op == "/") return 6;
     return -1;
 }
 
@@ -150,7 +155,9 @@ string curr_token_status(){
     string t = value;
     if(type == TEXT || type == INT) return "begin";
     if(type == NAME) return "begin";
+    if(value == "(" || value == ")") return "brackets";
     if(t == "++" || t == "--") return "post";
+    if(t == "=") return "equal";
     if(t == "+=" || t == "-=") return "equal";
     if(t == "*=" || t == "/=") return "equal";
     if(op_priority(value) != -1) return "operation";
@@ -164,6 +171,7 @@ string expression() {
     while(true) {
         string status = curr_token_status();
         //begin not_expression post equal operation
+//        DBG(status)
         if(status == "not_expression")
             break;
         if(must_value){
@@ -178,29 +186,31 @@ string expression() {
                 }
                 must_value = false;
             }else if(value == "-"){
-                stack.push_back("bm");
+                stack.push_back("-b");
             }else if(value == "("){
                 stack.push_back(value);
             }else{
                 throw "Wrong expression";
             }
-            next();
         }else{
             if(status == "post") {
+
                 string last_token_status = check_poliz(expression_begin, 0).status;
                 if(last_token_status == "ptr"){
-                    poliz_add("execute" , "" , value);
+                    poliz_add("execute" , "operation" , value);
                 }else
                     throw "Incorrect use of postfix operations";
             }else if(value == ")"){
                 while(true){
                     if(stack.size() == 0)
                         throw "The balance of brackets is not observed";
+//                    DBG(stack.back())
                     if(stack.back() == "("){
                         stack.pop_back();
                         break;
                     }
                     poliz_add("execute", "operation", stack.back());
+                    stack.pop_back();
                 }
             }else if(status == "equal"){
                 //return branch
@@ -210,6 +220,7 @@ string expression() {
                 poliz_unit last = check_poliz(expression_begin, 0);
                 if(last.status != "ptr")
                     throw "Before equal operation must be variable";
+                next();
                 string res_type = expression();
                 if(res_type != last.type)
                     throw "Wrong type of equal statement";
@@ -218,15 +229,16 @@ string expression() {
                     return res_type;
                 }
 
-            }else{
+            }else if(status == "operation"){
                 must_value = true;
                 int curr_prior = op_priority(value);
-                while(op_priority(stack.back()) > curr_prior){
+                while(stack.size() > 0 && op_priority(stack.back()) > curr_prior){
                     poliz_add("execute", "operation", stack.back());
                     stack.pop_back();
                 }
                 stack.push_back(value);
-            }
+            } else
+                throw "Unexpected token status in expression";
         }
         next();
     }
@@ -234,12 +246,56 @@ string expression() {
         throw "Wrong end of expression";
 
     while(stack.size()){
-        poliz_add("execute", "", stack.back());
+        poliz_add("execute", "operation", stack.back());
         stack.pop_back();
     }
 
     ////check types of all operation operators
-    
+    vector<string>types;
+    for(int i = expression_begin; i < poliz.size(); i++) {
+        poliz_unit curr = poliz[i];
+//        DBG(curr.value)
+//        DBG(curr.type)
+        if (curr.status == "value" || curr.status == "ptr") {
+            types.push_back(curr.type);
+        } else if (curr.status == "execute") {
+            string v = curr.value;
+            if (v == "++" || v == "--") {
+                if (types.size() == 0)throw "Expression unknown error";
+                if (types.back() != "int")
+                    throw "Post operations must be integer type";
+            } else if (v == "-" || v == "*" || v == "/") {
+                if (types.size() < 2)throw "Expression unknown error";
+                if (types.back() != "int" || types[types.size() - 2] != "int")
+                    throw "Arithmetic operation must be using with numeric types";
+                types.pop_back();
+            }else if (op_priority(v) > 0 && op_priority(v) <= 4 || v == "+") {
+                if (types.size() < 2)throw "Expression unknown error";
+                string t1 = types.back();
+                types.pop_back();
+                string t2 = types.back();
+                types.pop_back();
+                if(v == "+"){
+                    types.push_back(t1);
+                    if(t1 != t2) throw "Plus statements must be one type";
+                    if(t1 != "int" && t1 != "string")
+                        throw "+ can be applied only with string or int";
+                    continue;
+                }
+                if (t1 != t2) {
+                    throw "Compare operations must use one type values";
+                }
+                types.push_back("bool");
+            } else {
+                throw "Unknown expression error";
+            }
+        }else
+            throw "Unknown token status in expression";
+    }
+    if(types.size() != 1){
+        throw "Expression size error";
+    }
+    return types[0];
 }
 
 void struct_check() {
@@ -441,7 +497,7 @@ void block() {
 
 void new_variable() {
     if(type != TYPE) throw "Skipped type of variable";
-    string var_type = type;
+    string var_type = value;
     next();
     while (true) {
         if(type != NAME) throw "Expected variable name";
@@ -473,7 +529,9 @@ void program_body() {
         if (value == STRUCT) struct_check();
         else if (type == TYPE) func_check();
         else if (value == "{") global_block();
-        else throw ("Unexpected token " + value).c_str();
+        else{
+            throw "Unexpected token in program body";
+        }
     }
 }
 
@@ -494,23 +552,30 @@ result_report compile(string code) {
 
     beginning_preparation();
     vector < token > tokens;
-    tokens = tokenization(code);
-
-    it = tokens.begin();
-    end_it = tokens.end();
-
-    if(it == end_it){
-        return report;
-    }
-    value = it->value;
-    type = it->type;
+    pair<string, vector < token >>diagnostic = tokenization(code);
 
     try {
+        it = tokens.begin();
+        end_it = tokens.end();
+        tokens = diagnostic.second;
+
+        if(it == end_it){
+            if(diagnostic.first != ""){
+                report.error = diagnostic.first;
+                report.was_error = true;
+                report.line = 0;
+                report.position = 0;
+                report.error_token = "_null_";
+            }
+            return report;
+        }
+        value = it->value;
+        type = it->type;
         program_body();
     }
     catch (const char* error) {
         report.was_error = true;
-        report.error = error;
+        report.error = (string)error;
 
         if(it >= end_it)
             it = --end_it;

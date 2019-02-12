@@ -1,5 +1,4 @@
 #include "bits/stdc++.h"
-#include "state_machine.h"
 #include "compiler.h"
 
 #define print(x) cout<<x<<endl;
@@ -21,7 +20,6 @@ string read_file(string name) {
 
 int main() {
     string code = read_file("test_code.txt");
-
     cout<<code<<endl;
 
     result_report result = compile(code);
@@ -34,4 +32,5 @@ int main() {
         cout << ("Line: ") << result.line << "\n";
         cout << "Position: " << result.position << '\n';
     }
+    return 0;
 }
