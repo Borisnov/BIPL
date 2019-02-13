@@ -61,22 +61,31 @@ void poliz_break_here() {
 
 ///semantic functions
 
+struct function_data{
+    string return_type;
+    vector<string>arg_types;
+};
+
 string curr_function_return_value = "void";
 vector<map<string, string>> variables (1);  ///find index of var by its name;
 map<string, string>get_var_type; /// find type of var by its index;
-map<string, vector<string>>functions_types;
+map<string, function_data>functions_types;
 vector<string>parents = {"main"};
 
 bool was_return_value;
 int variable_index = 0;
 
+bool check_function(string name){
+    return (functions_types.find(name) != functions_types.end());
+}
+
 void add_function(string name, string type){
-    vector<string>t;
-    t.push_back(type);
-    if(functions_types.find(name) != functions_types.end()){
+    function_data f;
+    f.return_type = type;
+    if(check_function(name)){
         throw "Function with this name already exists";
     }
-    functions_types[name] = t;
+    functions_types[name] = f;
 }
 
 void add_empty_visibility_area(){
@@ -105,6 +114,8 @@ void add_variable(string name, string type){
 }
 
 string check_variable(string name){
+    if(check_function(name))
+        throw "Variable have same name as function";
     for(int i = variables.size() - 1; i >= 0; i--){
         if(variables[i].find(name) != variables[i].end()){
             return variables[i][name];
@@ -153,6 +164,7 @@ int op_priority(string op){
 
 string curr_token_status(){
     string t = value;
+    if(check_function(value)) return "begin";
     if(type == TEXT || type == INT) return "begin";
     if(type == NAME) return "begin";
     if(value == "(" || value == ")") return "brackets";
@@ -162,6 +174,31 @@ string curr_token_status(){
     if(t == "*=" || t == "/=") return "equal";
     if(op_priority(value) != -1) return "operation";
     return "not_expression";
+}
+string expression();
+
+string call_function(){
+    string func_name = value;
+    next();
+    int ars_size = functions_types[func_name].arg_types.size();
+    string return_type = functions_types[func_name].return_type;
+    check_current("(");
+//    DBG(ars_size);
+    for(int i = 0; i < ars_size; i++){
+        string exp_type = expression();
+        string arg_type = functions_types[func_name].arg_types[i];
+//        DBG(arg_type);
+        if(arg_type != exp_type)
+            throw "Function call parameters are different from accepted";
+        if(i == ars_size - 1){
+            if(value != ")")
+                throw "Wrong function call";
+        }
+        else
+            check_current(",");
+    }
+    poliz_add("func", return_type, func_name);
+    return return_type;
 }
 
 string expression() {
@@ -176,7 +213,9 @@ string expression() {
             break;
         if(must_value){
             if(status == "begin"){
-                if(type == NAME){
+                if(check_function(value)){
+                    call_function();
+                }else if(type == NAME){
                     string ind = check_variable(value);
                     poliz_add("ptr", get_var_type[ind], ind);
                 }else if(type == INT){
@@ -201,9 +240,13 @@ string expression() {
                 }else
                     throw "Incorrect use of postfix operations";
             }else if(value == ")"){
+                bool exp_end = false;
                 while(true){
-                    if(stack.size() == 0)
-                        throw "The balance of brackets is not observed";
+                    if(stack.size() == 0){
+                        exp_end = true;
+                        break;
+                    }
+                        //throw "The balance of brackets is not observed";
 //                    DBG(stack.back())
                     if(stack.back() == "("){
                         stack.pop_back();
@@ -212,6 +255,7 @@ string expression() {
                     poliz_add("execute", "operation", stack.back());
                     stack.pop_back();
                 }
+                if(exp_end)break;
             }else if(status == "equal"){
                 //return branch
                 string curr_val = value;
@@ -258,7 +302,14 @@ string expression() {
 //        DBG(curr.type)
         if (curr.status == "value" || curr.status == "ptr") {
             types.push_back(curr.type);
-        } else if (curr.status == "execute") {
+        }else if(curr.status == "func"){
+            for(int arg = 0; arg <
+                functions_types[curr.value].arg_types.size();
+                arg ++){
+                types.pop_back();
+            }
+            types.push_back(functions_types[curr.value].return_type);
+        }else if (curr.status == "execute") {
             string v = curr.value;
             if (v == "++" || v == "--") {
                 if (types.size() == 0)throw "Expression unknown error";
@@ -373,6 +424,7 @@ void for_check() {
     poliz_jump_here(skip_loop_block);
     poliz_break_here();
     parents.pop_back();
+    delete_last_visibility_area();
 }
 
 void while_check() {
@@ -401,9 +453,12 @@ void while_check() {
 }
 
 void function_parameters(string func_name) {
+    if(value == ")"){
+        return;
+    }
     while(true){
         if(type != TYPE) throw "Wrong function parameter";
-        functions_types[func_name].push_back(value);
+        functions_types[func_name].arg_types.push_back(value);
         next();
         if(type != NAME) throw "Wrong function parameter name";
         next();
@@ -449,6 +504,7 @@ void expression_action(){
 }
 
 void break_check() {
+    check_current("break");
     string parent = parents.back();
     if(!(parent == "while" || parent == "for")){
         throw "Break can be only in while or for loop";
@@ -460,6 +516,8 @@ void break_check() {
 }
 
 void continue_check(){
+    check_current("continue");
+    check_current(";");
     string parent = parents.back();
     if(!(parent == "while" || parent == "for")){
         throw "continue can be only in while or for loop";
@@ -469,9 +527,12 @@ void continue_check(){
 }
 
 void return_check(){
+    check_current("return");
     was_return_value = true;
     if(curr_function_return_value != "void"){
         string exp_type = expression();
+        if(curr_function_return_value != exp_type)
+            throw "Return value must be same type as function";
     }
     check_current(";");
 }
@@ -555,9 +616,10 @@ result_report compile(string code) {
     pair<string, vector < token >>diagnostic = tokenization(code);
 
     try {
+        tokens = diagnostic.second;
         it = tokens.begin();
         end_it = tokens.end();
-        tokens = diagnostic.second;
+
 
         if(it == end_it){
             if(diagnostic.first != ""){

@@ -20,7 +20,7 @@ string read_file(string name) {
 
 int main() {
     string code = read_file("test_code.txt");
-    cout<<code<<endl;
+//    cout<<code<<endl;
 
     result_report result = compile(code);
 
