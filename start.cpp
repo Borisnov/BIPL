@@ -1,7 +1,6 @@
 #include "bits/stdc++.h"
 #include "compiler.h"
 
-#define print(x) cout<<x<<endl;
 string POLIZ_FILE_NAME = "POLIZ.txt";
 
 using namespace std;
@@ -60,8 +59,8 @@ int main(int argc, char *argv[]) {
         }
         poliz_file.close();
     }else {
-        print("ERROR");
-        print(result.error);
+        cout << "ERROR" << '\n';
+        cout << result.error<<'\n';
         cout << ("Line: ") << result.line << "\n";
         cout << "Position: " << result.position << '\n';
     }

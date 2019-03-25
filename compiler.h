@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define DBG(x) cout << "DBG output : "<<#x << " = " << x << endl;
+//#define DBG(x) cout << "DBG output : "<<#x << " = " << x << endl;
 
 const string TEXT = "string";
 const string NAME = "name";
@@ -63,8 +63,8 @@ void poliz_break_here() {
 struct function_data{
     string return_type;
     vector<string>arg_types;
+    vector<string>arg_names;
 };
-//map<string, map<string, string>>struct_data;
 
 string curr_function_return_value = "void";
 vector<map<string, string>> variables (1);  ///find index of var by its name;
@@ -72,16 +72,12 @@ map<string, string>get_var_type; /// find type of var by its index;
 map<string, function_data>functions_types;
 vector<string>parents = {"main"};
 
-bool check_struct(string name);
 bool check_function(string name);
 string check_variable(string name);
 
 bool was_return_value;
 int variable_index = 0;
 
-//bool check_struct(string name){
-//    return (struct_data.find(name) != struct_data.end());
-//}
 
 bool check_function(string name){
     return (functions_types.find(name) != functions_types.end());
@@ -95,20 +91,7 @@ bool is_variable(string name, bool last = false){
     return false;
 };
 
-//void add_struct(string name){
-//    if(check_function(name))
-//        throw "Function have same name as struct";
-//    if(is_variable(name))
-//        throw "Struct have same name as variable";
-//    if(check_struct(name))
-//        throw "Struct with this name already exists";
-//    map<string, string>a;
-//    struct_data[name] = a;
-//}
-
 void add_function(string name, string type){
-//    if(check_struct(name))
-//        throw "Struct with same name was found";
     if(is_variable(name))
         throw "Variable with same name was found";
     function_data f;
@@ -138,8 +121,6 @@ string new_var_index(){
 void add_variable(string name, string type){
     if(check_function(name))
         throw "Variable have same name as function";
-//    if(check_struct(name))
-//        throw "Variable have same name as struct";
     if(is_variable(name, 1)){
         throw "Re initialization of variable";
     }
@@ -211,15 +192,16 @@ string curr_token_status(){
 }
 string expression();
 
-void input_check(){
-    check_current("input");
+void input_check(string input_type){
+    check_current(input_type + "_input");
     check_current("(");
     if(value != ")")
         throw "Input call error";
-    poliz_add("value", "int", "__input__");
+    poliz_add("value", input_type, "INPUT");
     //check_current(")");
     //check_current(";");
 }
+
 
 string call_function(){
     string func_name = value;
@@ -257,13 +239,15 @@ string expression() {
             break;
         if(must_value){
             if(status == "begin"){
-                if(check_function(value)){
+                if(check_function(value))
                     call_function();
-                }else if(value == "input")input_check();
-                /*else if(check_struct(value)){
-                    pair<string, string> t = check_struct_item();
-                    poliz_add("ptr", t.first, t.second);
-                }*/else if(type == NAME){
+                else if(value == "int_input"){
+                    input_check("int");
+                }
+                else if(value == "string_input"){
+                    input_check("string");
+                }
+                else if(type == NAME){
                     string ind = check_variable(value);
                     poliz_add("ptr", get_var_type[ind], ind);
                 }else if(type == INT){
@@ -397,14 +381,13 @@ string expression() {
     return types[0];
 }
 
-void new_variable(string struct_name = "") {
+void new_variable() {
     if(type != TYPE) throw "Skipped type of variable";
     string var_type = value;
     next();
     while (true) {
         if(type != NAME) throw "Expected variable name";
         string var_name = value;
-        struct_data[struct_name][var_name] = var_type;
         add_variable(var_name, var_type);
 
         next();
@@ -426,19 +409,6 @@ void new_variable(string struct_name = "") {
     }
 }
 
-void struct_check() {
-    add_empty_visibility_area();
-    check_current("struct");
-    if(type != NAME) throw "Skipped name of struct";
-    string struct_name = value;
-    add_struct(struct_name);
-    next();
-    check_current("{");
-    while(value != "}")
-        new_variable(struct_name);
-    check_current("}");
-    delete_last_visibility_area();
-}
 
 void if_check() {
     check_current("if");
@@ -543,8 +513,14 @@ void function_parameters(string func_name) {
     while(true){
         if(type != TYPE) throw "Wrong function parameter";
         functions_types[func_name].arg_types.push_back(value);
+        string var_type = value;
         next();
         if(type != NAME) throw "Wrong function parameter name";
+        string var_name = value;
+        add_variable(var_name, var_type);
+
+        poliz_add("FUNC", "HEAD_VAR", check_variable(var_name));
+//        functions_types[func_name].arg_names.push_back(func_name);
         next();
         if(value == ")"){
             return;
@@ -555,6 +531,7 @@ void function_parameters(string func_name) {
 }
 
 void func_check() {
+
     was_return_value = false;
     parents.push_back("func");
     add_empty_visibility_area();
@@ -566,19 +543,27 @@ void func_check() {
 
     if(type != NAME) throw "Wrong function name";
     string func_name = value;
+    poliz_add("FUNC", "BEGIN", func_name);
+    poliz_add("FUNC", "TYPE", curr_function_return_value);
+
     add_function(value, curr_function_return_value);
     next();
 
     check_current("(");
     function_parameters(func_name);
     check_current(")");
+    poliz_add("FUNC", "END_HEAD", "BODY_BEGIN");
+
+//    for(string )
 
     block();
     if(curr_function_return_value != "void" && !was_return_value)
         throw "This function must return some value";
+
     curr_function_return_value = "void";
     delete_last_visibility_area();
     parents.pop_back();
+    poliz_add("FUNC", "END", "FUNC_END");
 }
 
 void expression_action(){
@@ -620,25 +605,15 @@ void return_check(){
     check_current(";");
 }
 
-bool is_system_function(){
-    if(value == "print")return true;
-    if(value == "input")return true;
-}
-
 void print_check(){
     check_current("print");
     check_current("(");
-    expression();
+    string exp_type = expression();
     check_current(")");
+    poliz_add("SYSTEM", exp_type, "print");
     check_current(";");
 }
 
-
-void system_func_check(){
-    if(value == "print")print_check();
-    else if(value == "input")input_check();
-    else throw "System function does not found";
-}
 
 void one_action(){
     if(value == "if") if_check();
@@ -668,8 +643,7 @@ void global_block(){
 
 void program_body() {
     while (it < end_it) {
-        /*if (value == STRUCT) struct_check();
-        else*/if (type == TYPE) func_check();
+        if (type == TYPE) func_check();
         else if (value == "{") global_block();
         else{
             throw "Unexpected token in program body";

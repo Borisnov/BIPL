@@ -1,7 +1,5 @@
 {
-    int a = 0;
-    a ++;
-    if(a < 0)
-        a = 5;
-    int b = a;
+    int a = int_input();
+    string b = string_input();
+    print(a);
 }
