@@ -1,21 +1,7 @@
 {
-    int xx = 65*98;
-}
-int f(int c, int xx){
-    return 3 / 789 + xx;
-}
-{
-    int  b, a;
-    a = f(a, b);
-    string c = "abc" + "eeee";
-    string s;
-    s;
-    while(a > 34){
-        a--;
-    }
-    a *= b - a;
-    c = "abc";
-    if(a == a){
-        int k = 65 + 65;
-    }
+    int a = 0;
+    a ++;
+    if(a < 0)
+        a = 5;
+    int b = a;
 }

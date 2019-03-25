@@ -93,7 +93,7 @@ vector<pair<string, vector<string>>>tokens_initializing = {
             "return",
             "bipl",
             "break",
-            "struct",
+            //"struct",
             "continue"
         }}
     };
