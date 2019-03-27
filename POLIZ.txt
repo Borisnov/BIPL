@@ -1,8 +1,8 @@
-0	ptr         int            var_0     
-1	value       int            INPUT     
-2	execute     equal          =         
-3	ptr         string         var_1     
-4	value       string         INPUT     
-5	execute     equal          =         
-6	ptr         int            var_0     
-7	SYSTEM      int            print     
+ptr         int            var_0     
+value       int            INPUT     
+execute     equal          =         
+ptr         string         var_1     
+value       string         INPUT     
+execute     equal          =         
+ptr         int            var_0     
+SYSTEM      int            print     

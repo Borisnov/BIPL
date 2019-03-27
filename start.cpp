@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 //        Генерируем нормальное представление полиза из массива piliz
         int poliz_string_count = 0;
         for(vector<poliz_unit>::iterator unit = poliz.begin(); unit != poliz.end(); ++unit){
-            poliz_file << poliz_string_count ++ << '\t';
+//            poliz_file << poliz_string_count ++ << '\t';
             poliz_file << align_output(unit->status, 12)<<align_output(unit->type, 15)<<align_output(unit->value);
             poliz_file << '\n';
         }

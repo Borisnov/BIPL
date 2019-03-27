@@ -560,10 +560,10 @@ void func_check() {
     if(curr_function_return_value != "void" && !was_return_value)
         throw "This function must return some value";
 
+    poliz_add("FUNC", "END", "FUNC_END");
     curr_function_return_value = "void";
     delete_last_visibility_area();
     parents.pop_back();
-    poliz_add("FUNC", "END", "FUNC_END");
 }
 
 void expression_action(){
@@ -602,6 +602,7 @@ void return_check(){
         if(curr_function_return_value != exp_type)
             throw "Return value must be same type as function";
     }
+    poliz_add("FUNC", curr_function_return_value, "RETURN");
     check_current(";");
 }
 
@@ -649,6 +650,7 @@ void program_body() {
             throw "Unexpected token in program body";
         }
     }
+    poliz_add("SYSTEM", "PROGRAM", "PROGRAM_END");
 }
 
 struct result_report{
